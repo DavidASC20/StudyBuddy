@@ -1,13 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Home.css'; 
 
 function Home() {
+  const navigate = useNavigate();
+
+  const handleViewTestsClick = () => {
+    navigate('/view-tests');
+  };
+
   function handleUploadClick() {
     console.log("Upload Test button clicked!");
-  }
-
-  function handleViewTestsClick() {
-    console.log("View Existing Tests button clicked!");
   }
 
   return (
