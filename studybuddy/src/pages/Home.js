@@ -10,7 +10,7 @@ function Home() {
   };
 
   function handleUploadClick() {
-    console.log("Upload Test button clicked!");
+    navigate('/upload-test');
   }
 
   return (

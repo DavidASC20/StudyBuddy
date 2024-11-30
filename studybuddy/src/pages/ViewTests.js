@@ -19,7 +19,7 @@ function ViewTests() {
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search for a test..."
+          placeholder="Search for a test!"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
