@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 const express = require('express');
 const mysql = require('mysql2');
@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 const cors = require('cors');
 app.use(cors());
 
+// MySQL Database Connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST, 
   user: process.env.DB_USER, 
@@ -21,7 +22,8 @@ db.connect(err => {
     console.log('Connected to MySQL');
   }
 });
-w
+
+// Endpoint to fetch all departments
 app.get('/api/departments', (req, res) => {
   const sql = 'SELECT department_code, department_name FROM departments';
 
@@ -34,6 +36,35 @@ app.get('/api/departments', (req, res) => {
   });
 });
 
+// Endpoint to fetch all classes for a specific department
+app.get('/api/classes', (req, res) => {
+  const departmentCode = req.query.department; // Extract department query parameter
+
+  if (!departmentCode) {
+    return res.status(400).json({ error: 'Missing department query parameter' });
+  }
+
+  const sql = `
+    SELECT class_code, class_name 
+    FROM classes 
+    WHERE department_code = ?
+  `;
+
+  db.query(sql, [departmentCode], (err, results) => {
+    if (err) {
+      console.error('Error fetching classes:', err);
+      return res.status(500).json({ error: 'Failed to fetch classes' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No classes found for this department' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
