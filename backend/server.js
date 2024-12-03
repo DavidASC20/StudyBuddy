@@ -64,6 +64,35 @@ app.get('/api/classes', (req, res) => {
   });
 });
 
+app.get('/api/tests', (req, res) => {
+  const departmentCode = req.query.department;
+  const classCode = req.query.class;
+
+  if (!departmentCode || !classCode) {
+    return res.status(400).json({ error: 'Missing department or class query parameter' });
+  }
+
+  const sql = `
+    SELECT test_number, test_name, test_semester, test_year, test_file_path
+    FROM tests
+    WHERE department_code = ? AND class_code = ?
+  `;
+
+  db.query(sql, [departmentCode, classCode], (err, results) => {
+    if (err) {
+      console.error('Error fetching tests:', err);
+      return res.status(500).json({ error: 'Failed to fetch tests' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No tests found for this class' });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
