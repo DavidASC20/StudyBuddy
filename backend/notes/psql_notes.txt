@@ -1,0 +1,15 @@
+-- check if the postgresql server is running
+sudo service postgresql status
+
+-- start postgresql
+sudo service postgresql start
+
+-- stop postgresql
+sudo service postgresql stop
+
+
+javac ----
+javac -cp "lib/postgresql-42.7.3.jar" -d out src/sb_db/Database/DatabaseInitializer.java
+
+java ----
+java -cp "lib/postgresql-42.7.3.jar:out" sb_db.Database.DatabaseInitializer

@@ -1,12 +1,14 @@
+
+--- h2 startup
+
 -- start server
 java -cp "lib/h2-2.3.232.jar" org.h2.tools.Server
 
-
 -- end server
 java -cp "lib/h2-2.3.232.jar" org.h2.tools.Server -tcpShutdown "tcp://localhost:8082"
-
 or CTRL-C wherever the server is running if not in background
 
 -- start code
 javac -cp "lib/h2-2.3.232.jar" -d out src/sb_db/Database/DatabaseInitializer.java
 java -cp "lib/h2-2.3.232.jar;out" sb_db.Database.DatabaseInitializer
+
