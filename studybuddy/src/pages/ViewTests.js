@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ViewTests.css';
 
 function ViewTests() {
@@ -8,10 +8,46 @@ function ViewTests() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
 
-  // Fetch all departments on component mount
+  // Placeholder function to simulate fetching departments
+  const fetchDepartments = () => {
+    // Replace with actual API call when available
+    return Promise.resolve([
+      { department_code: 'CS', department_name: 'Computer Science' },
+      { department_code: 'ENG', department_name: 'Engineering' },
+    ]);
+  };
+
+  // Placeholder function to simulate fetching classes based on department
+  const fetchClasses = (department) => {
+    // Replace with actual API call when available
+    if (department === 'CS') {
+      return Promise.resolve([
+        { class_code: 'CS101', class_name: 'Intro to Computer Science' },
+        { class_code: 'CS102', class_name: 'Data Structures' },
+      ]);
+    } else if (department === 'ENG') {
+      return Promise.resolve([
+        { class_code: 'ENG101', class_name: 'Introduction to Engineering' },
+      ]);
+    }
+    return Promise.resolve([]);
+  };
+
+  // Placeholder function to simulate fetching tests based on department and class
+  const fetchTests = (department, classCode) => {
+    // Replace with actual API call when available
+    if (department === 'CS' && classCode === 'CS101') {
+      return Promise.resolve([
+        { test_name: 'Midterm', test_semester: 'Fall', test_year: 2023 },
+        { test_name: 'Final', test_semester: 'Fall', test_year: 2023 },
+      ]);
+    }
+    return Promise.resolve([]);
+  };
+
+  // Fetch departments on component mount
   useEffect(() => {
-    fetch('/api/departments')
-      .then((response) => response.json())
+    fetchDepartments()
       .then((data) => setDepartments(data))
       .catch((error) => console.error('Error fetching departments:', error));
   }, []);
@@ -19,20 +55,24 @@ function ViewTests() {
   // Fetch classes whenever a department is selected
   useEffect(() => {
     if (selectedDepartment) {
-      fetch(`/api/classes?department=${selectedDepartment}`)
-        .then((response) => response.json())
+      fetchClasses(selectedDepartment)
         .then((data) => setClasses(data))
         .catch((error) => console.error('Error fetching classes:', error));
+    } else {
+      setClasses([]);
+      setSelectedClass('');
+      setTests([]);
     }
   }, [selectedDepartment]);
 
   // Fetch tests whenever a class is selected
   useEffect(() => {
     if (selectedDepartment && selectedClass) {
-      fetch(`/api/tests?department=${selectedDepartment}&class=${selectedClass}`)
-        .then((response) => response.json())
+      fetchTests(selectedDepartment, selectedClass)
         .then((data) => setTests(data))
         .catch((error) => console.error('Error fetching tests:', error));
+    } else {
+      setTests([]);
     }
   }, [selectedDepartment, selectedClass]);
 
@@ -98,6 +138,5 @@ function ViewTests() {
     </div>
   );
 }
-
 
 export default ViewTests;
