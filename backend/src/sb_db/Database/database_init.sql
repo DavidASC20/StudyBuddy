@@ -26,15 +26,19 @@ CREATE TABLE courses (
 --  - course_code: code for the class
 --  - teacher: teacher teaching the course
 --  - test_number: an integer restricted to 0-99 (ensuring a maximum of 2 digits),
+--  - term: summer, fall, spring
+--  - year: year taken this exam
 --  - path: a TEXT field to store file paths for PDFs,
 --  - description: optional text for any additional details.
 CREATE TABLE tests (
     testid SERIAL PRIMARY KEY,
-    type VARCHAR(20) NOT NULL,
     dept_prefix CHAR(4) NOT NULL,
-    course_code CHAR(4) NOT NULL CHECK (code ~ '^[0-9]{4}$'),
+    code CHAR(4) NOT NULL CHECK (code ~ '^[0-9]{4}$'),
     teacher TEXT NOT NULL,
+    asses_type VARCHAR(20) NOT NULL,
     test_number INTEGER NOT NULL CHECK (test_number BETWEEN 0 AND 99),
+    term CHAR(1) NOT NULL, -- F, fall; S, spring; U, summer
+    year INTEGER NOT NULL,
     path TEXT NOT NULL,
     description TEXT
 );

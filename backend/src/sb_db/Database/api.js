@@ -6,11 +6,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+
 // POST /tests - Create a new test
+// Expects: {dept_prefix, code, teacher, asses_type, test_number, path, description }
 app.post("/tests", async (req, res) => {
   try {
-    const { course_id, assess_type, assess_number, path, description } = req.body;
-    const test = await addTest(course_id, assess_type, assess_number, path, description);
+    const {dept_prefix, code, teacher, asses_type, test_number, term, year, path, description } = req.body;
+    const test = await addTest(dept_prefix, code, teacher, asses_type, test_number, term, year, path, description);
     res.json(test);
   } catch (error) {
     console.error("Error inserting test:", error);
