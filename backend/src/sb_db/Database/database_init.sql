@@ -22,12 +22,18 @@ CREATE TABLE courses (
 -- Create tests table with:
 --  - testid: auto-incrementing id,
 --  - type: up to 20 characters,
+--  - dept_prefix: department
+--  - course_code: code for the class
+--  - teacher: teacher teaching the course
 --  - test_number: an integer restricted to 0-99 (ensuring a maximum of 2 digits),
 --  - path: a TEXT field to store file paths for PDFs,
 --  - description: optional text for any additional details.
 CREATE TABLE tests (
     testid SERIAL PRIMARY KEY,
     type VARCHAR(20) NOT NULL,
+    dept_prefix CHAR(4) NOT NULL,
+    course_code CHAR(4) NOT NULL CHECK (code ~ '^[0-9]{4}$'),
+    teacher TEXT NOT NULL,
     test_number INTEGER NOT NULL CHECK (test_number BETWEEN 0 AND 99),
     path TEXT NOT NULL,
     description TEXT
