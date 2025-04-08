@@ -10,7 +10,7 @@ public class DatabaseInitializer {
 
     public static void main(String[] args) {
         try {
-
+            /*
             DatabaseInteractions dbi = new DatabaseInteractions();
 
             dbi.create_db();
@@ -28,6 +28,7 @@ public class DatabaseInitializer {
             tests = dbi.getAllTests();
             System.out.println("\n\n\n After DELETE \n\n\n");
             for (String test : tests) { System.out.println(test); }
+            */
 
         } catch (Exception e) {
             System.err.println("Database connection failed");
