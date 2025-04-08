@@ -6,25 +6,30 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// POST /tests - Create a new test
 app.post("/tests", async (req, res) => {
   try {
     const { course_id, assess_type, assess_number, path, description } = req.body;
     const test = await addTest(course_id, assess_type, assess_number, path, description);
     res.json(test);
   } catch (error) {
+    console.error("Error inserting test:", error);
     res.status(500).json({ error: "Error inserting test" });
   }
 });
 
+// GET /tests - Retrieve all tests
 app.get("/tests", async (req, res) => {
   try {
     const tests = await getAllTests();
     res.json(tests);
   } catch (error) {
+    console.error("Error fetching tests:", error);
     res.status(500).json({ error: "Error fetching tests" });
   }
 });
 
+// PUT /tests/:id - Update test description
 app.put("/tests/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -32,21 +37,28 @@ app.put("/tests/:id", async (req, res) => {
     const updatedTest = await updateTest(id, description);
     res.json(updatedTest);
   } catch (error) {
+    console.error("Error updating test:", error);
     res.status(500).json({ error: "Error updating test" });
   }
 });
 
+// DELETE /tests/:id - Delete a test
 app.delete("/tests/:id", async (req, res) => {
   try {
-    const success = await deleteTest(req.params.id);
-    if (success) res.json({ message: 'Test with ID ${req.params.id} deleted.' });
-    else res.status(500).json({ error: "Failed to delete test" });
+    const { id } = req.params;
+    const success = await deleteTest(id);
+    if (success) {
+      res.json({ message: `Test with ID ${id} deleted.` });
+    } else {
+      res.status(404).json({ error: `Test with ID ${id} not found.` });
+    }
   } catch (error) {
+    console.error("Error deleting test:", error);
     res.status(500).json({ error: "Error deleting test" });
   }
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log('Server running on http://localhost:${PORT}');
+  console.log(`Server running on http://localhost:${PORT}`);
 });
