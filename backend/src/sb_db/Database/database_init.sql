@@ -111,9 +111,9 @@ INSERT INTO courses(code, dept_prefix, course_name) VALUES('2210', 'CSCI', 'Math
 INSERT INTO courses(code, dept_prefix, course_name) VALUES('4130', 'CSCI', 'AI in Fiction and Fact') ON CONFLICT (dept_prefix, code) DO NOTHING;
 INSERT INTO courses(code, dept_prefix, course_name) VALUES('4140', 'CSCI', 'Machine Learning and Optimization') ON CONFLICT (dept_prefix, code) DO NOTHING;
 INSERT INTO courses(code, dept_prefix, course_name) VALUES('4180', 'CSCI', 'Trustworthy Machine Learning') ON CONFLICT (dept_prefix, code) DO NOTHING;
-INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
-INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
-INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
-INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
-INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+-- INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+-- INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+-- INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+-- INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+-- INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
 

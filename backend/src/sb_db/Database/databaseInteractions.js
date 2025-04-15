@@ -52,7 +52,7 @@ const getAllTests = async () => {
 };
 
 const getAllDepartments = async () => {
-  const query = "SELECT * FROM departments";
+  const query = "SELECT * FROM departments;";
   try {
     const result = await pool.query(query);
     console.log("Fetched all departments:", result.rows);
@@ -62,4 +62,4 @@ const getAllDepartments = async () => {
   }
 };
 
-module.exports = { addTest, deleteTest, updateTest, getAllTests };
+module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments };

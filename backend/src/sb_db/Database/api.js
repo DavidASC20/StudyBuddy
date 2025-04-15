@@ -62,13 +62,14 @@ app.delete("/api/tests/:id", async (req, res) => {
 
 app.get('/api/departments', async (req, res) => {
   try {
-    const departments = await getAllDepartments();
-    res.json(departments);
-  }catch(error){
-      console.error("Error fetching departments:", error);
-      res.status(500).json({ error: "Error fetching tests"})
+    const tests = await getAllDepartments();
+    res.json(tests);
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    res.status(500).json({ error: "Error fetching departmnets" });
   }
 });
+
 
 
 const PORT = process.env.PORT || 5000;
