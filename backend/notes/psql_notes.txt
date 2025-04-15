@@ -8,8 +8,9 @@ sudo service postgresql start
 sudo service postgresql stop
 
 
-javac ----
-javac -cp "lib/postgresql-42.7.3.jar" -d out src/sb_db/Database/DatabaseInitializer.java
+----- populate databse
+psql -h localhost -U postgres -d studybuddy -f database_init.sql
+----- run EXPRESS
+node api.js
 
-java ----
-java -cp "lib/postgresql-42.7.3.jar:out" sb_db.Database.DatabaseInitializer
+---- local entry into db
