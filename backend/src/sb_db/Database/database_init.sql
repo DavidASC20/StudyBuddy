@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS departments (
 CREATE TABLE IF NOT EXISTS courses (
     code CHAR(4) NOT NULL CHECK (code ~ '^[0-9]{4}$'),
     dept_prefix CHAR(4) NOT NULL,
+    course_name TEXT,
     PRIMARY KEY (dept_prefix, code),
     FOREIGN KEY (dept_prefix) REFERENCES departments (prefix)
 );
@@ -46,54 +47,73 @@ CREATE TABLE IF NOT EXISTS tests (
 -- adding departments
 
 -- HASS
-INSERT INTO departments(prefix) VALUES( 'ARTS ');
-INSERT INTO departments(prefix) VALUES( 'COGS ');
-INSERT INTO departments(prefix) VALUES( 'COMM ');
-INSERT INTO departments(prefix) VALUES( 'ECON ');
-INSERT INTO departments(prefix) VALUES( 'GSAS ');
-INSERT INTO departments(prefix) VALUES( 'IHSS ');
-INSERT INTO departments(prefix) VALUES( 'INQR ');
-INSERT INTO departments(prefix) VALUES( 'LANG ');
-INSERT INTO departments(prefix) VALUES( 'LITR ');
-INSERT INTO departments(prefix) VALUES( 'PHIL ');
-INSERT INTO departments(prefix) VALUES( 'PSYC ');
-INSERT INTO departments(prefix) VALUES( 'STSO ');
-INSERT INTO departments(prefix) VALUES( 'WRIT ');
+INSERT INTO departments(prefix) VALUES( 'ARTS') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'COGS') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'COMM') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ECON') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'GSAS') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'IHSS') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'INQR') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'LANG') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'LITR') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'PHIL') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'PSYC') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'STSO') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'WRIT') ON CONFLICT (prefix) DO NOTHING;
 -- Engineering
-INSERT INTO departments(prefix) VALUES( 'BMED ');
-INSERT INTO departments(prefix) VALUES( 'CHME ');
-INSERT INTO departments(prefix) VALUES( 'CIVL ');
-INSERT INTO departments(prefix) VALUES( 'ECSE ');
-INSERT INTO departments(prefix) VALUES( 'ENGR ');
-INSERT INTO departments(prefix) VALUES( 'ENVE ');
-INSERT INTO departments(prefix) VALUES( 'ESCI ');
-INSERT INTO departments(prefix) VALUES( 'ISYE ');
-INSERT INTO departments(prefix) VALUES( 'MANE ');
-INSERT INTO departments(prefix) VALUES( 'MTLE ');
+INSERT INTO departments(prefix) VALUES( 'BMED') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'CHME') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'CIVL') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ECSE') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ENGR') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ENVE') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ESCI') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ISYE') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'MANE') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'MTLE') ON CONFLICT (prefix) DO NOTHING;
 -- Architecture
-INSERT INTO departments(prefix) VALUES( 'ARCH ');
-INSERT INTO departments(prefix) VALUES( 'LGHT ');
+INSERT INTO departments(prefix) VALUES( 'ARCH') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'LGHT') ON CONFLICT (prefix) DO NOTHING;
 -- ITWS
-INSERT INTO departments(prefix) VALUES( 'ITWS ');
+INSERT INTO departments(prefix) VALUES( 'ITWS') ON CONFLICT (prefix) DO NOTHING;
 -- Science
-INSERT INTO departments(prefix) VALUES( 'ASTR ');
-INSERT INTO departments(prefix) VALUES( 'BCBP ');
-INSERT INTO departments(prefix) VALUES( 'BIOL ');
-INSERT INTO departments(prefix) VALUES( 'CHEM ');
-INSERT INTO departments(prefix) VALUES( 'CSCI ');
-INSERT INTO departments(prefix) VALUES( 'ERTH ');
-INSERT INTO departments(prefix) VALUES( 'ISCI ');
-INSERT INTO departments(prefix) VALUES( 'MATH ');
-INSERT INTO departments(prefix) VALUES( 'MATP ');
-INSERT INTO departments(prefix) VALUES( 'PHYS ');
+INSERT INTO departments(prefix) VALUES( 'ASTR') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'BCBP') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'BIOL') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'CHEM') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'CSCI') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ERTH') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ISCI') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'MATH') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'MATP') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'PHYS') ON CONFLICT (prefix) DO NOTHING;
 -- Management
-INSERT INTO departments(prefix) VALUES( 'BUSN ');
-INSERT INTO departments(prefix) VALUES( 'MGMT ');
+INSERT INTO departments(prefix) VALUES( 'BUSN') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'MGMT') ON CONFLICT (prefix) DO NOTHING;
 -- Interdisciplinary and Other
-INSERT INTO departments(prefix) VALUES( 'ADMN ');
-INSERT INTO departments(prefix) VALUES( 'USAF ');
-INSERT INTO departments(prefix) VALUES( 'ASAR ');
-INSERT INTO departments(prefix) VALUES( 'USNA ');
+INSERT INTO departments(prefix) VALUES( 'ADMN') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'USAF') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'ASAR') ON CONFLICT (prefix) DO NOTHING;
+INSERT INTO departments(prefix) VALUES( 'USNA') ON CONFLICT (prefix) DO NOTHING;
 -- Uncategorized
-INSERT INTO departments(prefix) VALUES( 'ILEA ');
+INSERT INTO departments(prefix) VALUES( 'ILEA') ON CONFLICT (prefix) DO NOTHING;
 ----------------------
+
+-----------------------------------------
+-- CSCI
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('1100', 'CSCI', 'Computer Science I') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('1200', 'CSCI', 'Data Structures') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('1700', 'CSCI', 'Early Introduction to RCOS') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('2300', 'CSCI', 'Introduction to Algorithms') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('2500', 'CSCI', 'Computer Organization') ON CONFLICT (dept_prefix, code) DO NOTHING;
+
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('2210', 'CSCI', 'Mathematical Foundations of Machine Learning (MFML)') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('4130', 'CSCI', 'AI in Fiction and Fact') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('4140', 'CSCI', 'Machine Learning and Optimization') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('4180', 'CSCI', 'Trustworthy Machine Learning') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+INSERT INTO courses(code, dept_prefix, course_name) VALUES('', 'CSCI', '') ON CONFLICT (dept_prefix, code) DO NOTHING;
+
