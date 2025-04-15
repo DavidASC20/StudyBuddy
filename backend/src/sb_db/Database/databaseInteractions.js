@@ -51,4 +51,15 @@ const getAllTests = async () => {
   }
 };
 
+const getAllDepartments = async () => {
+  const query = "SELECT * FROM departments";
+  try {
+    const result = await pool.query(query);
+    console.log("Fetched all departments:", result.rows);
+    return result.rows;
+  } catch (err){
+    console.error("Error fetching departments:", err);
+  }
+};
+
 module.exports = { addTest, deleteTest, updateTest, getAllTests };
