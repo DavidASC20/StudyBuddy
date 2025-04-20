@@ -16,57 +16,59 @@ function UploadTest() {
 
   // Fetch departments on component mount
   useEffect(() => {
-    fetch('/api/departments') // Replace with your API endpoint
+    fetch('/api/departments')
       .then((response) => response.json())
       .then((data) => setDepartments(data))
       .catch((error) => console.error('Error fetching departments:', error));
   }, []);
 
-  // Fetch classes when a department is selected
+  // Fetch classes when a department is selected (placeholder remains)
   useEffect(() => {
     if (formData.department) {
-      fetch(`/api/classes?department=${formData.department}`) // Replace with your API endpoint
+      fetch(`/api/classes?department=${formData.department}`)
         .then((response) => response.json())
         .then((data) => setClasses(data))
         .catch((error) => console.error('Error fetching classes:', error));
+    } else {
+      setClasses([]);
+      setFormData((prev) => ({ ...prev, classCode: '' }));
     }
   }, [formData.department]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, testFile: e.target.files[0] });
+    setFormData((prev) => ({ ...prev, testFile: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append('department', formData.department);
-    formDataToSubmit.append('classCode', formData.classCode);
-    formDataToSubmit.append('testNumber', formData.testNumber);
-    formDataToSubmit.append('testName', formData.testName);
-    formDataToSubmit.append('semester', formData.semester);
-    formDataToSubmit.append('year', formData.year);
+    const payload = new FormData();
+    payload.append('department', formData.department);
+    payload.append('classCode', formData.classCode);
+    payload.append('testNumber', formData.testNumber);
+    payload.append('testName', formData.testName);
+    payload.append('semester', formData.semester);
+    payload.append('year', formData.year);
     if (formData.testFile) {
-      formDataToSubmit.append('testFile', formData.testFile);
+      payload.append('testFile', formData.testFile);
     }
 
     try {
-      const response = await fetch('/api/upload-test', {
+      const res = await fetch('/api/upload-test', {
         method: 'POST',
-        body: formDataToSubmit,
+        body: payload,
       });
-
-      if (response.ok) {
+      if (res.ok) {
         console.log('Test uploaded successfully');
       } else {
         console.error('Error uploading test');
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error:', err);
     }
   };
 
@@ -84,8 +86,8 @@ function UploadTest() {
           >
             <option value="">Select a Department</option>
             {departments.map((dept) => (
-              <option key={dept.department_code} value={dept.department_code}>
-                {dept.department_name} ({dept.department_code})
+              <option key={dept.prefix} value={dept.prefix}>
+                {dept.prefix}
               </option>
             ))}
           </select>
