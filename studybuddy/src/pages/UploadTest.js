@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './UploadTest.css';
 
 function UploadTest() {
@@ -11,23 +12,21 @@ function UploadTest() {
     testName: '',
     semester: '',
     year: '',
-    testFile: null, 
+    testFile: null,
   });
 
   // Fetch departments on component mount
   useEffect(() => {
-    fetch('/api/departments')
-      .then((response) => response.json())
-      .then((data) => setDepartments(data))
+    axios.get('http://localhost:5000/api/departments')
+      .then((response) => setDepartments(response.data))
       .catch((error) => console.error('Error fetching departments:', error));
   }, []);
 
   // Fetch classes when a department is selected (placeholder remains)
   useEffect(() => {
     if (formData.department) {
-      fetch(`/api/classes?department=${formData.department}`)
-        .then((response) => response.json())
-        .then((data) => setClasses(data))
+      axios.get(`http://localhost:5000/api/departments/${formData.department}/classes`)
+        .then((response) => setClasses(response.data))
         .catch((error) => console.error('Error fetching classes:', error));
     } else {
       setClasses([]);
@@ -47,28 +46,23 @@ function UploadTest() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = new FormData();
-    payload.append('department', formData.department);
-    payload.append('classCode', formData.classCode);
-    payload.append('testNumber', formData.testNumber);
-    payload.append('testName', formData.testName);
-    payload.append('semester', formData.semester);
+    payload.append('dept_prefix', formData.department);
+    payload.append('code', formData.classCode);
+    payload.append('test_number', formData.testNumber);
+    payload.append('description', formData.testName);
+    payload.append('term', formData.semester);
     payload.append('year', formData.year);
     if (formData.testFile) {
       payload.append('testFile', formData.testFile);
     }
 
     try {
-      const res = await fetch('/api/upload-test', {
-        method: 'POST',
-        body: payload,
+      const response = await axios.post('/api/upload-test', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-      if (res.ok) {
-        console.log('Test uploaded successfully');
-      } else {
-        console.error('Error uploading test');
-      }
-    } catch (err) {
-      console.error('Error:', err);
+      console.log('Test uploaded successfully:', response.data);
+    } catch (error) {
+      console.error('Error uploading test:', error);
     }
   };
 
@@ -104,8 +98,8 @@ function UploadTest() {
           >
             <option value="">Select a Class</option>
             {classes.map((cls) => (
-              <option key={cls.class_code} value={cls.class_code}>
-                {cls.class_code} - {cls.class_name}
+              <option key={cls.code} value={cls.code}>
+                {cls.course_name} ({cls.code})
               </option>
             ))}
           </select>
