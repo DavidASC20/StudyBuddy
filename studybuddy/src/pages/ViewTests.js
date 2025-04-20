@@ -10,50 +10,28 @@ function ViewTests() {
   const [selectedClass, setSelectedClass] = useState('');
 
   // API call for fetching departments
-  const fetchDepartments = () => {
-    return axios.get('http://localhost:5000/api/departments')
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching departments:', error);
-        throw error;
-      });
-  };
+  const fetchDepartments = () =>
+    axios
+      .get('http://localhost:5000/api/departments')
+      .then((res) => res.data);
 
-  // Placeholder function to simulate fetching classes based on department
-  const fetchClasses = (department) => {
-    if (department === 'CS') {
-      return Promise.resolve([
-        { class_code: 'CS101', class_name: 'Intro to Computer Science' },
-        { class_code: 'CS102', class_name: 'Data Structures' },
-      ]);
-    } else if (department === 'ENG') {
-      return Promise.resolve([
-        { class_code: 'ENG101', class_name: 'Introduction to Engineering' },
-      ]);
-    }
-    return Promise.resolve([]);
-  };
+  // **Real** API call for fetching classes based on department
+  const fetchClasses = (department) =>
+    axios
+      .get(`http://localhost:5000/api/departments/${department}/classes`)
+      .then((res) => res.data);
 
-  // Placeholder function to simulate fetching tests based on department and class
+  // Placeholder for fetching tests (you can replace similarly later)
   const fetchTests = (department, classCode) => {
-    if (department === 'CS' && classCode === 'CS101') {
-      return Promise.resolve([
-        { test_name: 'Midterm', test_semester: 'Fall', test_year: 2023 },
-        { test_name: 'Final', test_semester: 'Fall', test_year: 2023 },
-      ]);
-    }
+    // TODO: replace with your real tests API
     return Promise.resolve([]);
   };
 
-  // Fetch departments on component mount
+  // Fetch departments on mount
   useEffect(() => {
     fetchDepartments()
-      .then((depData) => {
-        console.log("Fetched departments:", depData);
-        return depData;
-      })
       .then((data) => setDepartments(data))
-      .catch((error) => console.error('Error fetching departments:', error));
+      .catch((err) => console.error('Error fetching departments:', err));
   }, []);
 
   // Fetch classes whenever a department is selected
@@ -61,7 +39,10 @@ function ViewTests() {
     if (selectedDepartment) {
       fetchClasses(selectedDepartment)
         .then((data) => setClasses(data))
-        .catch((error) => console.error('Error fetching classes:', error));
+        .catch((err) => {
+          console.error('Error fetching classes:', err);
+          setClasses([]);
+        });
     } else {
       setClasses([]);
       setSelectedClass('');
@@ -74,7 +55,10 @@ function ViewTests() {
     if (selectedDepartment && selectedClass) {
       fetchTests(selectedDepartment, selectedClass)
         .then((data) => setTests(data))
-        .catch((error) => console.error('Error fetching tests:', error));
+        .catch((err) => {
+          console.error('Error fetching tests:', err);
+          setTests([]);
+        });
     } else {
       setTests([]);
     }
@@ -90,9 +74,8 @@ function ViewTests() {
             value={selectedDepartment}
             onChange={(e) => {
               setSelectedDepartment(e.target.value);
-              setClasses([]); // Reset classes when department changes
-              setSelectedClass(''); // Reset selected class
-              setTests([]); // Reset tests
+              setSelectedClass('');
+              setTests([]);
             }}
           >
             <option value="">Select a Department</option>
@@ -111,14 +94,14 @@ function ViewTests() {
             value={selectedClass}
             onChange={(e) => {
               setSelectedClass(e.target.value);
-              setTests([]); // Reset tests when class changes
+              setTests([]);
             }}
             disabled={!classes.length}
           >
             <option value="">Select a Class</option>
             {classes.map((cls) => (
-              <option key={cls.class_code} value={cls.class_code}>
-                {cls.class_name} ({cls.class_code})
+              <option key={cls.code} value={cls.code}>
+                {cls.course_name} ({cls.code})
               </option>
             ))}
           </select>
@@ -129,14 +112,18 @@ function ViewTests() {
         <h2>Available Tests</h2>
         {tests.length > 0 ? (
           <ul className="test-list">
-            {tests.map((test, index) => (
-              <li key={index} className="test-item">
+            {tests.map((test, idx) => (
+              <li key={idx} className="test-item">
                 {`${test.test_name} - ${test.test_semester} ${test.test_year}`}
               </li>
             ))}
           </ul>
         ) : (
-          <p>{selectedClass ? 'No tests found for this class.' : 'Select a department and class to view tests.'}</p>
+          <p>
+            {selectedClass
+              ? 'No tests found for this class.'
+              : 'Select a department and class to view tests.'}
+          </p>
         )}
       </div>
     </div>
