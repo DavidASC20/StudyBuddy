@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments } = require("./databaseInteractions");
+const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment } = require("./databaseInteractions");
 
 const app = express();
 app.use(express.json());
@@ -73,18 +73,13 @@ app.get('/api/departments', async (req, res) => {
 app.get('/api/departments/:dept/classes', async (req, res) => {
   const { dept } = req.params;
   try {
-    // Query the courses table for records matching the provided department code.
-    const result = await pool.query(
-      "SELECT code, dept_prefix, course_name FROM courses WHERE dept_prefix = $1",
-      [dept]
-    );
-    res.json(result.rows);
+    const classes = await getClassesByDepartment(dept);
+    res.json(classes);
   } catch (error) {
-    console.error(`Error retrieving classes for department ${dept}:`, error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error(`Error fetching classes for department ${dept}:`, error);
+    res.status(500).json({ error: "Error fetching classes" });
   }
 });
-
 
 
 
