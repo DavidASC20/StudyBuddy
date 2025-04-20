@@ -8,6 +8,8 @@ function UploadTest() {
   const [formData, setFormData] = useState({
     department: '',
     classCode: '',
+    teacher: '',
+    asses_type: '',
     testNumber: '',
     testName: '',
     semester: '',
@@ -22,7 +24,7 @@ function UploadTest() {
       .catch((error) => console.error('Error fetching departments:', error));
   }, []);
 
-  // Fetch classes when a department is selected (placeholder remains)
+  // Fetch classes when a department is selected
   useEffect(() => {
     if (formData.department) {
       axios.get(`http://localhost:5000/api/departments/${formData.department}/classes`)
@@ -48,16 +50,22 @@ function UploadTest() {
     const payload = new FormData();
     payload.append('dept_prefix', formData.department);
     payload.append('code', formData.classCode);
+    payload.append('teacher', formData.teacher);
+    payload.append('asses_type', formData.asses_type);
     payload.append('test_number', formData.testNumber);
-    payload.append('description', formData.testName);
     payload.append('term', formData.semester);
     payload.append('year', formData.year);
+    // If uploading file, append and use its filename as path
     if (formData.testFile) {
       payload.append('testFile', formData.testFile);
+      payload.append('path', formData.testFile.name);
+    } else {
+      payload.append('path', '');
     }
+    payload.append('description', formData.testName);
 
     try {
-      const response = await axios.post('/api/upload-test', payload, {
+      const response = await axios.post('http://localhost:5000/api/tests', payload, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       console.log('Test uploaded successfully:', response.data);
@@ -106,6 +114,30 @@ function UploadTest() {
         </div>
 
         <div className="form-group">
+          <label>Teacher</label>
+          <input
+            type="text"
+            name="teacher"
+            value={formData.teacher}
+            onChange={handleInputChange}
+            placeholder="e.g., Wes Turner"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Assessment Type</label>
+          <input
+            type="text"
+            name="asses_type"
+            value={formData.asses_type}
+            onChange={handleInputChange}
+            placeholder="e.g., exam"
+            required
+          />
+        </div>
+
+        <div className="form-group">
           <label>Test Number</label>
           <input
             type="number"
@@ -136,6 +168,7 @@ function UploadTest() {
             value={formData.semester}
             onChange={handleInputChange}
             placeholder="e.g., Fall"
+            required
           />
         </div>
 
