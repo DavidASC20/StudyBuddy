@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { addTest, deleteTest, updateTest, getAllTests } = require("./databaseInteractions");
+const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment } = require("./databaseInteractions");
 
 const app = express();
 app.use(express.json());
@@ -9,7 +9,7 @@ app.use(cors());
 
 // POST /tests - Create a new test
 // Expects: {dept_prefix, code, teacher, asses_type, test_number, path, description }
-app.post("/tests", async (req, res) => {
+app.post("/api/tests", async (req, res) => {
   try {
     const {dept_prefix, code, teacher, asses_type, test_number, term, year, path, description } = req.body;
     const test = await addTest(dept_prefix, code, teacher, asses_type, test_number, term, year, path, description);
@@ -21,7 +21,7 @@ app.post("/tests", async (req, res) => {
 });
 
 // GET /tests - Retrieve all tests
-app.get("/tests", async (req, res) => {
+app.get("/api/tests", async (req, res) => {
   try {
     const tests = await getAllTests();
     res.json(tests);
@@ -32,7 +32,7 @@ app.get("/tests", async (req, res) => {
 });
 
 // PUT /tests/:id - Update test description
-app.put("/tests/:id", async (req, res) => {
+app.put("/api/tests/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { description } = req.body;
@@ -45,7 +45,7 @@ app.put("/tests/:id", async (req, res) => {
 });
 
 // DELETE /tests/:id - Delete a test
-app.delete("/tests/:id", async (req, res) => {
+app.delete("/api/tests/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const success = await deleteTest(id);
@@ -59,6 +59,30 @@ app.delete("/tests/:id", async (req, res) => {
     res.status(500).json({ error: "Error deleting test" });
   }
 });
+
+app.get('/api/departments', async (req, res) => {
+  try {
+    const tests = await getAllDepartments();
+    res.json(tests);
+  } catch (error) {
+    console.error("Error fetching departments:", error);
+    res.status(500).json({ error: "Error fetching departmnets" });
+  }
+});
+
+app.get('/api/departments/:dept/classes', async (req, res) => {
+  const { dept } = req.params;
+  try {
+    const classes = await getClassesByDepartment(dept);
+    res.json(classes);
+  } catch (error) {
+    console.error(`Error fetching classes for department ${dept}:`, error);
+    res.status(500).json({ error: "Error fetching classes" });
+  }
+});
+
+
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

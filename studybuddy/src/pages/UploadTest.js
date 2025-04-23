@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './UploadTest.css';
 
 function UploadTest() {
@@ -7,66 +8,69 @@ function UploadTest() {
   const [formData, setFormData] = useState({
     department: '',
     classCode: '',
+    teacher: '',
+    asses_type: '',
     testNumber: '',
     testName: '',
     semester: '',
     year: '',
-    testFile: null, 
+    testFile: null,
   });
 
   // Fetch departments on component mount
   useEffect(() => {
-    fetch('/api/departments') // Replace with your API endpoint
-      .then((response) => response.json())
-      .then((data) => setDepartments(data))
+    axios.get('http://localhost:5000/api/departments')
+      .then((response) => setDepartments(response.data))
       .catch((error) => console.error('Error fetching departments:', error));
   }, []);
 
   // Fetch classes when a department is selected
   useEffect(() => {
     if (formData.department) {
-      fetch(`/api/classes?department=${formData.department}`) // Replace with your API endpoint
-        .then((response) => response.json())
-        .then((data) => setClasses(data))
+      axios.get(`http://localhost:5000/api/departments/${formData.department}/classes`)
+        .then((response) => setClasses(response.data))
         .catch((error) => console.error('Error fetching classes:', error));
+    } else {
+      setClasses([]);
+      setFormData((prev) => ({ ...prev, classCode: '' }));
     }
   }, [formData.department]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, testFile: e.target.files[0] });
+    setFormData((prev) => ({ ...prev, testFile: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append('department', formData.department);
-    formDataToSubmit.append('classCode', formData.classCode);
-    formDataToSubmit.append('testNumber', formData.testNumber);
-    formDataToSubmit.append('testName', formData.testName);
-    formDataToSubmit.append('semester', formData.semester);
-    formDataToSubmit.append('year', formData.year);
+    const payload = new FormData();
+    payload.append('dept_prefix', formData.department);
+    payload.append('code', formData.classCode);
+    payload.append('teacher', formData.teacher);
+    payload.append('asses_type', formData.asses_type);
+    payload.append('test_number', formData.testNumber);
+    payload.append('term', formData.semester);
+    payload.append('year', formData.year);
+    // If uploading file, append and use its filename as path
     if (formData.testFile) {
-      formDataToSubmit.append('testFile', formData.testFile);
+      payload.append('testFile', formData.testFile);
+      payload.append('path', formData.testFile.name);
+    } else {
+      payload.append('path', '');
     }
+    payload.append('description', formData.testName);
 
     try {
-      const response = await fetch('/api/upload-test', {
-        method: 'POST',
-        body: formDataToSubmit,
+      const response = await axios.post('http://localhost:5000/api/tests', payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
-
-      if (response.ok) {
-        console.log('Test uploaded successfully');
-      } else {
-        console.error('Error uploading test');
-      }
+      console.log('Test uploaded successfully:', response.data);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error uploading test:', error);
     }
   };
 
@@ -84,8 +88,8 @@ function UploadTest() {
           >
             <option value="">Select a Department</option>
             {departments.map((dept) => (
-              <option key={dept.department_code} value={dept.department_code}>
-                {dept.department_name} ({dept.department_code})
+              <option key={dept.prefix} value={dept.prefix}>
+                {dept.prefix}
               </option>
             ))}
           </select>
@@ -102,11 +106,35 @@ function UploadTest() {
           >
             <option value="">Select a Class</option>
             {classes.map((cls) => (
-              <option key={cls.class_code} value={cls.class_code}>
-                {cls.class_code} - {cls.class_name}
+              <option key={cls.code} value={cls.code}>
+                {cls.course_name} ({cls.code})
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="form-group">
+          <label>Teacher</label>
+          <input
+            type="text"
+            name="teacher"
+            value={formData.teacher}
+            onChange={handleInputChange}
+            placeholder="e.g., Wes Turner"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Assessment Type</label>
+          <input
+            type="text"
+            name="asses_type"
+            value={formData.asses_type}
+            onChange={handleInputChange}
+            placeholder="e.g., exam"
+            required
+          />
         </div>
 
         <div className="form-group">
@@ -140,6 +168,7 @@ function UploadTest() {
             value={formData.semester}
             onChange={handleInputChange}
             placeholder="e.g., Fall"
+            required
           />
         </div>
 

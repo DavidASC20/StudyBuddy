@@ -51,4 +51,31 @@ const getAllTests = async () => {
   }
 };
 
-module.exports = { addTest, deleteTest, updateTest, getAllTests };
+const getAllDepartments = async () => {
+  const query = "SELECT * FROM departments;";
+  try {
+    const result = await pool.query(query);
+    console.log("Fetched all departments:", result.rows);
+    return result.rows;
+  } catch (err){
+    console.error("Error fetching departments:", err);
+  }
+};
+
+const getClassesByDepartment = async (dept) => {
+  const query = `
+    SELECT code, dept_prefix, course_name
+    FROM courses
+    WHERE dept_prefix = $1;
+  `;
+  try {
+    const result = await pool.query(query, [dept]);
+    console.log(`Fetched classes for department ${dept}:`, result.rows);
+    return result.rows;
+  } catch (err) {
+    console.error(`Error fetching classes for department ${dept}:`, err);
+    throw err;
+  }
+};
+
+module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment };
