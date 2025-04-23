@@ -78,4 +78,43 @@ const getClassesByDepartment = async (dept) => {
   }
 };
 
-module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment };
+// Get exams, given department prefix, course code.
+const getExamsByCourse = async (dept_prefix, code) => {
+  const query = "SELECT * FROM tests WHERE dept_prefix = $1 AND code = $2";
+  try {
+    const result = await pool.query(query, [dept_prefix, code]);
+    console.log("Fetched exams for course:", result.rows);
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching exams by course:", err);
+    throw err;
+  }
+};
+
+// Get exams given dept_prefix, course code, asses_type, test_number
+const getExamsByAssesTypeAndNumber = async (dept_prefix, code, asses_type, test_number) => {
+  const query = "SELECT * FROM tests WHERE dept_prefix = $1 AND code = $2 AND asses_type = $3 AND test_number = $4";
+  try {
+    const result = await pool.query(query, [dept_prefix, code, asses_type, test_number]);
+    console.log("Fetched exams by asses type and number:", result.rows);
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching exams by asses type and number:", err);
+    throw err;
+  }
+};
+
+// Get exams given dept_prefix, course code, and teacher.
+const getExamsByTeacher = async (dept_prefix, code, teacher) => {
+  const query = "SELECT * FROM tests WHERE dept_prefix = $1 AND code = $2 AND teacher = $3";
+  try {
+    const result = await pool.query(query, [dept_prefix, code, teacher]);
+    console.log("Fetched exams by teacher:", result.rows);
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching exams by teacher:", err);
+    throw err;
+  }
+};
+
+module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher};

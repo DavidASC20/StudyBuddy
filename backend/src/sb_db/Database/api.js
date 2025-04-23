@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment } = require("./databaseInteractions");
+const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher} = require("./databaseInteractions");
 
 const app = express();
 app.use(express.json());
@@ -81,8 +81,38 @@ app.get('/api/departments/:dept/classes', async (req, res) => {
   }
 });
 
+app.get('/tests/bycourse', async(req, res) => {
+  try {
+    const { dept_prefix, code } = req.query;
+    const tests = await getExamsByCourse(dept_prefix, code);
+    res.json(tests);
+  } catch (error) {
+    console.error("Error fetching tests by course:", error);
+    res.status(500).json({ error: "Error fetching tests by course" });
+  }
+});
 
+app.get("/tests/byasses", async (req, res) => {
+  try {
+    const { dept_prefix, code, asses_type, test_number } = req.query;
+    const tests = await getExamsByAssesTypeAndNumber(dept_prefix, code, asses_type, test_number);
+    res.json(tests);
+  } catch (error) {
+    console.error("Error fetching tests by asses type and number:", error);
+    res.status(500).json({ error: "Error fetching tests by asses type and number" });
+  }
+});
 
+app.get("/tests/byteacher", async (req, res) => {
+  try {
+    const { dept_prefix, code, teacher } = req.query;
+    const tests = await getExamsByTeacher(dept_prefix, code, teacher);
+    res.json(tests);
+  } catch (error) {
+    console.error("Error fetching tests by teacher:", error);
+    res.status(500).json({ error: "Error fetching tests by teacher" });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
