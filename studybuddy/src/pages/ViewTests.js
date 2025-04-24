@@ -9,6 +9,10 @@ function ViewTests() {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
 
+  const [teacherFilter, setTeacherFilter]   = useState('');
+  const [assesTypeFilter, setAssesTypeFilter] = useState('');
+  const [testNumberFilter, setTestNumberFilter] = useState('');
+
   // API call for fetching departments
   const fetchDepartments = () =>
     axios
@@ -36,6 +40,38 @@ function ViewTests() {
     }
   };
 
+  const handleSearchByTeacher = () => {
+    if (!selectedDepartment || !selectedClass || !teacherFilter) return;
+    axios.get(`http://localhost:5000/tests/byteacher`, {
+      params: {
+        dept_prefix: selectedDepartment,
+        code: selectedClass,
+        teacher: teacherFilter
+      }
+    })
+    .then(res => setTests(res.data))
+    .catch(err => {
+      console.error('Error fetching tests by teacher:', err);
+      setTests([]);
+    });
+  };
+
+  const handleSearchByAsses = () => {
+    if (!selectedDepartment || !selectedClass || !assesTypeFilter || testNumberFilter === '') return;
+    axios.get(`https://localhost:5000/tests/byasses`, {
+      params: {
+        dept_prefix: selectedDepartment,
+        code: selectedClass,
+        asses_type: assesTypeFilter,
+        test_number: testNumberFilter
+      }
+    })
+    .then(res => setTests(res.data))
+    .catch(err => {
+      console.error('Error fetching tests by assessment:', err);
+      setTests([]);
+    });
+  };
 
   // Fetch departments on mount
   useEffect(() => {
@@ -61,19 +97,19 @@ function ViewTests() {
       });
   }, [selectedDepartment]);
 
-  // load tests when both dept & class are selected
   useEffect(() => {
-    if (!selectedDepartment || !selectedClass) {
-      setTests([]);
-      return;
-    }
-
-    fetchTests(selectedDepartment, selectedClass)
-      .then(setTests)
+    if (selectedDepartment && selectedClass) {
+      axios.get(`https://localhost:5000/tests/bycourse`, {
+        params: { dept_prefix: selectedDepartment, code: selectedClass }
+      })
+      .then(res => setTests(res.data))
       .catch(err => {
-        console.error('Error fetching tests:', err);
+        console.error('Error fetching tests by course:', err);
         setTests([]);
       });
+    } else {
+      setTests([]);
+    }
   }, [selectedDepartment, selectedClass]);
 
   return (
