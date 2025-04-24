@@ -117,4 +117,43 @@ const getExamsByTeacher = async (dept_prefix, code, teacher) => {
   }
 };
 
-module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher};
+const searchTests = async (filters) => {
+  // Base WHERE and parameters
+  const clauses = ["dept_prefix = $1", "code = $2"];
+  const values = [filters.dept_prefix, filters.code];
+  
+  let idx = 3;
+  // Add optional filters
+  if (filters.teacher) {
+    clauses.push(`teacher = $${idx++}`);
+    values.push(filters.teacher);
+  }
+  if (filters.asses_type) {
+    clauses.push(`asses_type = $${idx++}`);
+    values.push(filters.asses_type);
+  }
+  if (filters.test_number) {
+    clauses.push(`test_number = $${idx++}`);
+    values.push(filters.test_number);
+  }
+  if (filters.term) {
+    clauses.push(`term = $${idx++}`);
+    values.push(filters.term);
+  }
+  if (filters.year) {
+    clauses.push(`year = $${idx++}`);
+    values.push(filters.year);
+  }
+
+  const query = `
+    SELECT * FROM tests
+    WHERE ${clauses.join(" AND ")}
+    ORDER BY year DESC, term, asses_type, test_number
+  `;
+
+  const result = await pool.query(query, values);
+  console.log("searchTests, SQL:", query, "values:", values);
+  return result.rows;
+};
+
+module.exports = { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher, searchTests};

@@ -73,6 +73,31 @@ function ViewTests() {
     });
   };
 
+  const handleSearch = () => {
+    if (!selectedDept || !selectedCode) {
+      alert("You need to specify a department prefix and corresponding course code");
+      return;
+    }
+
+    const params = {
+      dept_prefix: selectedDept,
+      code:        selectedCode,
+      ...(teacher     && { teacher }),
+      ...(assesType   && { asses_type: assesType }),
+      ...(testNumber  && { test_number: testNumber }),
+      ...(term        && { term }),
+      ...(year        && { year }),
+    };
+
+    /*console.log("Searching tests with:", params);*/
+    axios.get(TESTS_API, { params })
+      .then(res => setTests(res.data))
+      .catch(err => {
+        console.error("Search error:", err);
+        setTests([]);
+      });
+  };
+
   // Fetch departments on mount
   useEffect(() => {
     fetchDepartments()

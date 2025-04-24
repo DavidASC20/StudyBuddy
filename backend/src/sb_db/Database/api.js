@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher} = require("./databaseInteractions");
+const { addTest, deleteTest, updateTest, getAllTests, getAllDepartments, getClassesByDepartment, getExamsByCourse, getExamsByAssesTypeAndNumber, getExamsByTeacher, searchTests} = require("./databaseInteractions");
 
 const app = express();
 app.use(express.json());
@@ -111,6 +111,20 @@ app.get("/tests/byteacher", async (req, res) => {
   } catch (error) {
     console.error("Error fetching tests by teacher:", error);
     res.status(500).json({ error: "Error fetching tests by teacher" });
+  }
+});
+
+app.get("/tests/search", async (req, res) => {
+  try {
+    const filters = req.query;
+    if (!filters.dept_prefix || !filters.code) {
+      return res.status(400).json({ error: "dept_prefix and code are required" });
+    }
+    const tests = await searchTests(filters);
+    res.json(tests);
+  } catch (error) {
+    console.error("Error in /tests/search:", error);
+    res.status(500).json({ error: "Error searching tests" });
   }
 });
 
