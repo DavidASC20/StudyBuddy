@@ -1,95 +1,69 @@
+// src/pages/ViewTests.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ViewTests.css';
 
-function ViewTests() {
+const DEPT_API = 'http://localhost:5000/api/departments';
+const TESTS_API = 'http://localhost:5000/tests/search';
+
+export default function ViewTests() {
+  // dropdown data
   const [departments, setDepartments] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const [classes,     setClasses]     = useState([]);
+
+  // selected
+  const [selectedDept, setSelectedDept] = useState('');
+  const [selectedCode, setSelectedCode] = useState('');
+
+  // optional filters
+  const [teacher,    setTeacher]    = useState('');
+  const [assesType,  setAssesType]  = useState('');
+  const [testNumber, setTestNumber] = useState('');
+  const [term,       setTerm]       = useState('');
+  const [year,       setYear]       = useState('');
+
+  // results
   const [tests, setTests] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedClass, setSelectedClass] = useState('');
 
-  const [teacherFilter, setTeacherFilter]   = useState('');
-  const [assesTypeFilter, setAssesTypeFilter] = useState('');
-  const [testNumberFilter, setTestNumberFilter] = useState('');
+  // Load departments on mount
+  useEffect(() => {
+    axios.get(DEPT_API)
+      .then(res => setDepartments(res.data))
+      .catch(console.error);
+  }, []);
 
-  // API call for fetching departments
-  const fetchDepartments = () =>
-    axios
-      .get('http://localhost:5000/api/departments')
-      .then((res) => res.data);
-
-  // API call for fetching classes based on department
-  const fetchClasses = (department) =>
-    axios
-      .get(`http://localhost:5000/api/departments/${department}/classes`)
-      .then((res) => res.data);
-
-  
-  const fetchTests = async (dept, cls) => {
-    console.log('fetching tests for', { dept_prefix: dept, code: cls });
-    try {
-      const { data } = await axios.get('http://localhost:5000/tests/bycourse', {
-        params: { dept_prefix: dept, code: cls }
-      });
-      console.log('response data:', data);
-      return data;
-    } catch (err) {
-      console.error('error fetching tests:', err);
-      throw err;
-    }
-  };
-
-  const handleSearchByTeacher = () => {
-    if (!selectedDepartment || !selectedClass || !teacherFilter) return;
-    axios.get(`http://localhost:5000/tests/byteacher`, {
-      params: {
-        dept_prefix: selectedDepartment,
-        code: selectedClass,
-        teacher: teacherFilter
-      }
-    })
-    .then(res => setTests(res.data))
-    .catch(err => {
-      console.error('Error fetching tests by teacher:', err);
-      setTests([]);
-    });
-  };
-
-  const handleSearchByAsses = () => {
-    if (!selectedDepartment || !selectedClass || !assesTypeFilter || testNumberFilter === '') return;
-    axios.get(`https://localhost:5000/tests/byasses`, {
-      params: {
-        dept_prefix: selectedDepartment,
-        code: selectedClass,
-        asses_type: assesTypeFilter,
-        test_number: testNumberFilter
-      }
-    })
-    .then(res => setTests(res.data))
-    .catch(err => {
-      console.error('Error fetching tests by assessment:', err);
-      setTests([]);
-    });
-  };
-
-  const handleSearch = () => {
-    if (!selectedDept || !selectedCode) {
-      alert("You need to specify a department prefix and corresponding course code");
+  // Load classes when dept changes
+  useEffect(() => {
+    if (!selectedDept) {
+      setClasses([]); setSelectedCode('');
       return;
     }
+    axios.get(`${DEPT_API}/${selectedDept}/classes`)
+      .then(res => setClasses(res.data))
+      .catch(console.error);
+  }, [selectedDept]);
 
+  // Unified search handler
+  const handleSearch = () => {
+    if (!selectedDept || !selectedCode) {
+      alert("Please select both Department and Course.");
+      return;
+    }
+    // Build params object
     const params = {
       dept_prefix: selectedDept,
       code:        selectedCode,
+      // only include non-empty filters
       ...(teacher     && { teacher }),
+      /*
       ...(assesType   && { asses_type: assesType }),
       ...(testNumber  && { test_number: testNumber }),
       ...(term        && { term }),
       ...(year        && { year }),
+      */
     };
 
-    /*console.log("Searching tests with:", params);*/
+    console.log("Searching tests with:", params);
     axios.get(TESTS_API, { params })
       .then(res => setTests(res.data))
       .catch(err => {
@@ -98,135 +72,71 @@ function ViewTests() {
       });
   };
 
-  // Fetch departments on mount
-  useEffect(() => {
-    fetchDepartments()
-      .then((data) => setDepartments(data))
-      .catch((err) => console.error('Error fetching departments:', err));
-  }, []);
-
-  // load classes when department changes
-  useEffect(() => {
-    if (!selectedDepartment) {
-      setClasses([]);
-      setSelectedClass('');
-      setTests([]);
-      return;
-    }
-
-    fetchClasses(selectedDepartment)
-      .then(setClasses)
-      .catch(err => {
-        console.error('Error fetching classes:', err);
-        setClasses([]);
-      });
-  }, [selectedDepartment]);
-
-  useEffect(() => {
-    if (selectedDepartment && selectedClass) {
-      axios.get(`https://localhost:5000/tests/bycourse`, {
-        params: { dept_prefix: selectedDepartment, code: selectedClass }
-      })
-      .then(res => setTests(res.data))
-      .catch(err => {
-        console.error('Error fetching tests by course:', err);
-        setTests([]);
-      });
-    } else {
-      setTests([]);
-    }
-  }, [selectedDepartment, selectedClass]);
-
   return (
     <div className="view-tests-container">
+      <h1>Search Tests</h1>
 
-      <h1>View Tests</h1>
-      {/* dropdown menu */}
-      <div className="dropdown-row">
+      <div className="filter-row">
         <div>
           <label>Department</label>
           <select
-            value={selectedDepartment}
+            value={selectedDept}
             onChange={e => {
-              setSelectedDepartment(e.target.value);
-              setSelectedClass('');
+              setSelectedDept(e.target.value);
+              setSelectedCode('');
             }}
           >
             <option value="">-- Select Dept --</option>
             {departments.map(d => (
-              <option key={d.prefix} value={d.prefix}>
-                {d.prefix}
-              </option>
+              <option key={d.prefix} value={d.prefix}>{d.prefix}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label>Class</label>
+          <label>Course</label>
           <select
-            value={selectedClass}
+            value={selectedCode}
             disabled={!classes.length}
-            onChange={e => setSelectedClass(e.target.value)}
+            onChange={e => setSelectedCode(e.target.value)}
           >
-            <option value="">-- Select Class --</option>
+            <option value="">-- Select Course --</option>
             {classes.map(c => (
               <option key={c.code} value={c.code}>
-                {c.course_name} ({c.code})
+                {c.code}
               </option>
             ))}
           </select>
         </div>
-      </div>
 
-      {/* filter_dropdowns */}
-      <div className="filter-row">
-        {/* Teacher */}
         <div>
-          <label>Teacher</label>
+          <label>Teacher (optional)</label>
           <input
             type="text"
             placeholder="e.g. Wes Turner"
-            value={teacherFilter}
-            onChange={e => setTeacherFilter(e.target.value)}
-            disabled={!selectedClass}
+            value={teacher}
+            onChange={e => setTeacher(e.target.value)}
           />
-          <button onClick={handleSearchByTeacher} disabled={!teacherFilter}>
-            Search by Teacher
-          </button>
         </div>
 
-        {/* Assessment */}
-        <div>
-          <label>Assessment Type & Number</label>
-          <input
-            type="text"
-            placeholder="Type (exam/quiz)"
-            value={assesTypeFilter}
-            onChange={e => setAssesTypeFilter(e.target.value)}
-            disabled={!selectedClass}
-          />
-          <input
-            type="number"
-            placeholder="Number"
-            value={testNumberFilter}
-            onChange={e => setTestNumberFilter(e.target.value)}
-            disabled={!selectedClass}
-          />
-          <button onClick={handleSearchByAsses} disabled={!assesTypeFilter || testNumberFilter === ''}>
-            Search by Assessment
-          </button>
-        </div>
+        <button onClick={handleSearch} className="search-btn">
+          Search
+        </button>
       </div>
 
-      {/* Results Table */}
       <div className="results-container">
-        {tests.length ? (
+        {tests.length > 0 ? (
           <table className="results-table">
             <thead>
               <tr>
-                <th>ID</th><th>Type</th><th>Number</th>
-                <th>Term</th><th>Year</th><th>Teacher</th>
-                <th>Path</th><th>Description</th>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Number</th>
+                <th>Term</th>
+                <th>Year</th>
+                <th>Teacher</th>
+                <th>Path</th>
+                <th>Description</th>
               </tr>
             </thead>
             <tbody>
@@ -245,15 +155,9 @@ function ViewTests() {
             </tbody>
           </table>
         ) : (
-          <p>
-            {selectedClass
-              ? 'No tests found for that filter.'
-              : 'Select a department and class to view tests.'}
-          </p>
+          <p>No tests match your filters.</p>
         )}
       </div>
     </div>
   );
 }
-
-export default ViewTests;
