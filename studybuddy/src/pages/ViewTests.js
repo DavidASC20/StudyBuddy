@@ -15,17 +15,27 @@ function ViewTests() {
       .get('http://localhost:5000/api/departments')
       .then((res) => res.data);
 
-  // **Real** API call for fetching classes based on department
+  // API call for fetching classes based on department
   const fetchClasses = (department) =>
     axios
       .get(`http://localhost:5000/api/departments/${department}/classes`)
       .then((res) => res.data);
 
-  // Placeholder for fetching tests (you can replace similarly later)
-  const fetchTests = (department, classCode) => {
-    // TODO: replace with your real tests API
-    return Promise.resolve([]);
+  
+  const fetchTests = async (dept, cls) => {
+    console.log('fetching tests for', { dept_prefix: dept, code: cls });
+    try {
+      const { data } = await axios.get('http://localhost:5000/tests/bycourse', {
+        params: { dept_prefix: dept, code: cls }
+      });
+      console.log('response data:', data);
+      return data;
+    } catch (err) {
+      console.error('error fetching tests:', err);
+      throw err;
+    }
   };
+
 
   // Fetch departments on mount
   useEffect(() => {
@@ -34,34 +44,36 @@ function ViewTests() {
       .catch((err) => console.error('Error fetching departments:', err));
   }, []);
 
-  // Fetch classes whenever a department is selected
+  // load classes when department changes
   useEffect(() => {
-    if (selectedDepartment) {
-      fetchClasses(selectedDepartment)
-        .then((data) => setClasses(data))
-        .catch((err) => {
-          console.error('Error fetching classes:', err);
-          setClasses([]);
-        });
-    } else {
+    if (!selectedDepartment) {
       setClasses([]);
       setSelectedClass('');
       setTests([]);
+      return;
     }
+
+    fetchClasses(selectedDepartment)
+      .then(setClasses)
+      .catch(err => {
+        console.error('Error fetching classes:', err);
+        setClasses([]);
+      });
   }, [selectedDepartment]);
 
-  // Fetch tests whenever a class is selected
+  // load tests when both dept & class are selected
   useEffect(() => {
-    if (selectedDepartment && selectedClass) {
-      fetchTests(selectedDepartment, selectedClass)
-        .then((data) => setTests(data))
-        .catch((err) => {
-          console.error('Error fetching tests:', err);
-          setTests([]);
-        });
-    } else {
+    if (!selectedDepartment || !selectedClass) {
       setTests([]);
+      return;
     }
+
+    fetchTests(selectedDepartment, selectedClass)
+      .then(setTests)
+      .catch(err => {
+        console.error('Error fetching tests:', err);
+        setTests([]);
+      });
   }, [selectedDepartment, selectedClass]);
 
   return (
@@ -111,13 +123,34 @@ function ViewTests() {
       <div className="results-container">
         <h2>Available Tests</h2>
         {tests.length > 0 ? (
-          <ul className="test-list">
-            {tests.map((test, idx) => (
-              <li key={idx} className="test-item">
-                {`${test.test_name} - ${test.test_semester} ${test.test_year}`}
-              </li>
-            ))}
-          </ul>
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Number</th>
+                <th>Term</th>
+                <th>Year</th>
+                <th>Teacher</th>
+                <th>Path</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tests.map(test => (
+                <tr key={test.testid}>
+                  <td>{test.testid}</td>
+                  <td>{test.asses_type}</td>
+                  <td>{test.test_number}</td>
+                  <td>{test.term}</td>
+                  <td>{test.year}</td>
+                  <td>{test.teacher}</td>
+                  <td>{test.path}</td>
+                  <td>{test.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <p>
             {selectedClass
