@@ -114,75 +114,107 @@ function ViewTests() {
 
   return (
     <div className="view-tests-container">
-      <div className="dropdown-container">
-        <div className="dropdown">
-          <label htmlFor="department">Department</label>
+
+      <h1>View Tests</h1>
+      {/* dropdown menu */}
+      <div className="dropdown-row">
+        <div>
+          <label>Department</label>
           <select
-            id="department"
             value={selectedDepartment}
-            onChange={(e) => {
+            onChange={e => {
               setSelectedDepartment(e.target.value);
               setSelectedClass('');
-              setTests([]);
             }}
           >
-            <option value="">Select a Department</option>
-            {departments.map((dept) => (
-              <option key={dept.prefix} value={dept.prefix}>
-                {dept.prefix}
+            <option value="">-- Select Dept --</option>
+            {departments.map(d => (
+              <option key={d.prefix} value={d.prefix}>
+                {d.prefix}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="dropdown">
-          <label htmlFor="class">Class</label>
+        <div>
+          <label>Class</label>
           <select
-            id="class"
             value={selectedClass}
-            onChange={(e) => {
-              setSelectedClass(e.target.value);
-              setTests([]);
-            }}
             disabled={!classes.length}
+            onChange={e => setSelectedClass(e.target.value)}
           >
-            <option value="">Select a Class</option>
-            {classes.map((cls) => (
-              <option key={cls.code} value={cls.code}>
-                {cls.course_name} ({cls.code})
+            <option value="">-- Select Class --</option>
+            {classes.map(c => (
+              <option key={c.code} value={c.code}>
+                {c.course_name} ({c.code})
               </option>
             ))}
           </select>
         </div>
       </div>
 
+      {/* filter_dropdowns */}
+      <div className="filter-row">
+        {/* Teacher */}
+        <div>
+          <label>Teacher</label>
+          <input
+            type="text"
+            placeholder="e.g. Wes Turner"
+            value={teacherFilter}
+            onChange={e => setTeacherFilter(e.target.value)}
+            disabled={!selectedClass}
+          />
+          <button onClick={handleSearchByTeacher} disabled={!teacherFilter}>
+            Search by Teacher
+          </button>
+        </div>
+
+        {/* Assessment */}
+        <div>
+          <label>Assessment Type & Number</label>
+          <input
+            type="text"
+            placeholder="Type (exam/quiz)"
+            value={assesTypeFilter}
+            onChange={e => setAssesTypeFilter(e.target.value)}
+            disabled={!selectedClass}
+          />
+          <input
+            type="number"
+            placeholder="Number"
+            value={testNumberFilter}
+            onChange={e => setTestNumberFilter(e.target.value)}
+            disabled={!selectedClass}
+          />
+          <button onClick={handleSearchByAsses} disabled={!assesTypeFilter || testNumberFilter === ''}>
+            Search by Assessment
+          </button>
+        </div>
+      </div>
+
+      {/* Results Table */}
       <div className="results-container">
-        <h2>Available Tests</h2>
-        {tests.length > 0 ? (
+        {tests.length ? (
           <table className="results-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Number</th>
-                <th>Term</th>
-                <th>Year</th>
-                <th>Teacher</th>
-                <th>Path</th>
-                <th>Description</th>
+                <th>ID</th><th>Type</th><th>Number</th>
+                <th>Term</th><th>Year</th><th>Teacher</th>
+                <th>Path</th><th>Description</th>
               </tr>
             </thead>
             <tbody>
-              {tests.map(test => (
-                <tr key={test.testid}>
-                  <td>{test.testid}</td>
-                  <td>{test.asses_type}</td>
-                  <td>{test.test_number}</td>
-                  <td>{test.term}</td>
-                  <td>{test.year}</td>
-                  <td>{test.teacher}</td>
-                  <td>{test.path}</td>
-                  <td>{test.description}</td>
+              {tests.map(t => (
+                <tr key={t.testid}>
+                  <td>{t.testid}</td>
+                  <td>{t.asses_type}</td>
+                  <td>{t.test_number}</td>
+                  <td>{t.term}</td>
+                  <td>{t.year}</td>
+                  <td>{t.teacher}</td>
+                  <td>{t.path}</td>
+                  <td>{t.description}</td>
                 </tr>
               ))}
             </tbody>
@@ -190,7 +222,7 @@ function ViewTests() {
         ) : (
           <p>
             {selectedClass
-              ? 'No tests found for this class.'
+              ? 'No tests found for that filter.'
               : 'Select a department and class to view tests.'}
           </p>
         )}
